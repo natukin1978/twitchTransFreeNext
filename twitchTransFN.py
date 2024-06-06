@@ -402,13 +402,7 @@ class Bot(commands.Bot):
         if config.Debug: print(f'--- Translation ---')
         translatedText = ''
 
-        # en:Use database to reduce deepl limit     ja:データベースの活用でDeepLの字数制限を軽減
-        translation_from_database = None
-
-        if translation_from_database is not None:
-            translatedText = translation_from_database[0]
-            if config.Debug: print(f'[Local Database](SQLite database file)')
-        elif (translation_from_database is None) and (in_text is not None):
+        if (in_text is not None):
             # use deepl --------------
             # (try to use deepl, but if the language is not supported, text will be translated by google!)
             if config.Translator == 'deepl':
