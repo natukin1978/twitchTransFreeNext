@@ -6,6 +6,7 @@ from http.client import HTTPSConnection as hc
 from twitchio.ext import commands
 from emoji import distinct_emoji_list
 import json, os, shutil, re, asyncio, deepl, sys, signal, tts, sound, httpx
+import database_controller as db # ja:既訳語データベース   en:Translation Database
 
 version = '2.7.4'
 '''
@@ -409,7 +410,13 @@ class Bot(commands.Bot):
         if config.Debug: print(f'--- Translation ---')
         translatedText = ''
 
-        if (in_text is not None):
+        # en:Use database to reduce deepl limit     ja:データベースの活用でDeepLの字数制限を軽減
+        translation_from_database = await db.get(in_text,lang_dest) if in_text is not None else None
+
+        if translation_from_database is not None:
+            translatedText = translation_from_database[0]
+            if config.Debug: print(f'[Local Database](SQLite database file)')
+        elif (translation_from_database is None) and (in_text is not None):
             # use deepl --------------
             # (try to use deepl, but if the language is not supported, text will be translated by google!)
             if config.Translator == 'deepl':
@@ -456,6 +463,9 @@ class Bot(commands.Bot):
             else:
                 print(f'ERROR: config TRANSLATOR is set the wrong value with [{config.Translator}]')
                 return
+
+            # en:Save the translation to database   ja:翻訳をデータベースに保存する
+            await db.save(in_text,translatedText,lang_dest)
 
         # チャットへの投稿 ----------------
         # 投稿内容整形 & 投稿
@@ -563,3 +573,5 @@ def main():
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     main()
+    db.close()
+    db.delete()
