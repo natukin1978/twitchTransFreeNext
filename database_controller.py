@@ -12,7 +12,7 @@ table_name = 'translations'
 cwd = os.getcwd()						# en:Current Working Directory 	ja:現在の作業フォルダ
 db_file = os.path.join(cwd,db_name)		# en:Database File				ja:データベース・ファイル
 
-db = TinyDB(db_name)
+db = TinyDB(db_name, encoding='utf-8')
 print("Connected to database.")
 
 tb = db.table(table_name)
