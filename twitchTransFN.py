@@ -144,15 +144,9 @@ async def GAS_Trans(session, text, lang_source, lang_target):
         "target": lang_target,
     }
 
-    # 非同期のHTTP GET リクエストを送信
-    async with httpx.AsyncClient() as client:
+    # 非同期のHTTP GET リクエストを送信し、リダイレクトを自動的に追従
+    async with httpx.AsyncClient(follow_redirects=True) as client:
         response = await client.get(base_url, params=params)
-
-        # レスポンスのステータスコードが302である場合、リダイレクト先のURLを取得
-        if response.status_code == 302:
-            redirect_url = response.headers['Location']
-            # 新たにリダイレクト先のURLにリクエストを送信
-            response = await client.get(redirect_url)
 
         # レスポンスのステータスコードが200であることを確認
         if response.status_code == 200:
