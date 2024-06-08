@@ -22,8 +22,25 @@ print("Connected to database.")
 
 tb = db.table(table_name)
 
+def get_datetime_now():
+	return datetime.datetime.now()
+
 async def save(message,translation,dlang):	# en:Save the translations   ja:翻訳を保存する
-	tb.insert({"message": message, "dlang": dlang, "translation": translation})
+	query = Query()
+	result = tb.get((query.message == message) & (query.translation == translation) & (query.dlang == dlang))
+	if result:
+		# en:Update Don't   ja:更新不要
+		return
+	else:
+		now = get_datetime_now()
+		record = {
+			"message": message,
+			"dlang": dlang,
+			"translation": translation,
+			"created_at": now,
+			"reference_at": now,
+		}
+		tb.insert(record)
 
 async def get(message,dlang):  # en:Get the translations    ja:翻訳を入手する
 	query = Query()
