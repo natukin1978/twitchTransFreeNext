@@ -52,7 +52,14 @@ async def get(message,dlang):  # en:Get the translations    ja:翻訳を入手�
 	return result["translation"]
 
 def delete():
-	pass
+	# en:Rumors last for 75 days    ja:人の噂も七十五日
+	seventy_five_days_ago = get_datetime_now() - datetime.timedelta(days=75)
+	query = Query()
+	old_records = tb.search(query.reference_at < seventy_five_days_ago)
+	if not old_records:
+		return
+	old_record_ids = [record.doc_id for record in old_records]
+	tb.remove(doc_ids=old_record_ids)
 
 def close():
 	pass
