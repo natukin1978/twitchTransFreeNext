@@ -45,8 +45,10 @@ async def save(message,translation,dlang):	# en:Save the translations   ja:翻�
 async def get(message,dlang):  # en:Get the translations    ja:翻訳を入手する
 	query = Query()
 	result = tb.get((query.message == message) & (query.dlang == dlang))
-	if (not result):
+	if not result:
 		return None
+	now = get_datetime_now()
+	tb.update({"reference_at": now}, doc_ids=[result.doc_id])
 	return result["translation"]
 
 def delete():
